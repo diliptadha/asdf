@@ -1,0 +1,421 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id                      String              @id @default(auto()) @map("_id") @db.ObjectId
+  userId                  String              @unique
+  firstName               String?
+  lastName                String?
+  age                     Int?
+  designation             String?
+  techStack               String[]
+  emailId                 String              @unique
+  password                String
+  hourlyRate              Float?
+  country                 String?
+  address                 String?
+  phoneNo                 Int                 @unique
+  yearOfExperience        Float?
+  profilePicture          String?
+  resume                  String
+  vettingResults          vettingResults[]
+  typeOfEngagement        typeOfEngagement?
+  currentStatus           currentStatus?
+  noticePeriod            String?
+  userRole                userRole?
+  educationDetails        educationDetails[]
+  experienceDetails       experienceDetails[]
+  summary                 String?
+  managerID               String?
+  certificate             String?
+  client                  String?
+  technicalInterviewNotes String?
+  softSkillAssessment     String?
+  verifiedAiTools         String[]
+  hiredDate               DateTime?
+  socialLinks             socialLink          @relation(fields: [socialLinkId], references: [id])
+  socialLinkId            String              @db.ObjectId
+}
+
+model educationDetails {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @unique
+  course     String
+  university String
+  department String
+  startDate  DateTime?
+  endDate    DateTime?
+  user       user     @relation(fields: [userId], references: [userId])
+}
+
+model experienceDetails {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String    @unique
+  companyName    String
+  techStack      String[]
+  designation    String
+  responsibility String
+  startDate      DateTime?
+  endDate        DateTime?
+  user           user      @relation(fields: [userId], references: [userId])
+}
+
+enum typeOfEngagement {
+  partTime @map("PARTTIME")
+  fullTime @map("FULLTIME")
+}
+
+enum currentStatus {
+  openToWork @map("OPENTOWORK")
+  engage     @map("ENGAGE")
+}
+
+enum userRole {
+  developer      @map("DEVELOPER")
+  client         @map("CLIENT")
+  admin          @map("ADMIN")
+  successManager @map("SUCCESSMANAGER")
+}
+
+model document {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String?  @unique
+  document String[]
+}
+
+model socialLink {
+  id         String        @id @default(auto()) @map("_id") @db.ObjectId
+  facebook   String?
+  linkedIn   String?
+  twitter    String?
+  user       user[]
+  teamDetail teamDetails[]
+}
+
+model hiredData {
+  id                   String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId               String       @unique
+  name                 String
+  designation          String
+  location             String
+  rate                 Float
+  overview             overview     @relation(fields: [overviewDetails], references: [id])
+  bonusHistory         bonusHistory @relation(fields: [bonusHistoryDetails], references: [id])
+  raiseHistory         raiseHistory @relation(fields: [raiseHistoryDetails], references: [id])
+  benefits             benefits     @relation(fields: [benefitsDetails], references: [id])
+  hiredSettings        hiredSetting @relation(fields: [hiredSettingsDetails], references: [id])
+  overviewDetails      String       @db.ObjectId
+  bonusHistoryDetails  String       @db.ObjectId
+  raiseHistoryDetails  String       @db.ObjectId
+  benefitsDetails      String       @db.ObjectId
+  hiredSettingsDetails String       @db.ObjectId
+}
+
+model grantSalaryRaise {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String   @unique
+  raiseAmount       Float
+  dateAffected      DateTime
+  currentRate       Float
+  raiseAfterRate    Float
+  messageAboutRaise String
+}
+
+model overview {
+  id                String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String           @unique
+  workingHoursInDay Int
+  workType          workType
+  monthlySalary     Float
+  bonusGiven        Float
+  weeklySummary     weeklySummaries? @relation(fields: [weeklySummariesId], references: [id])
+  weeklySummariesId String           @db.ObjectId
+  hiredData         hiredData[]
+}
+
+model weeklySummaries {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String
+  workingTime Float
+  date        DateTime
+  overview    overview[]
+}
+
+model bonusHistory {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String      @unique
+  developer String
+  role      String
+  amount    Float
+  sentOn    DateTime
+  hiredData hiredData[]
+}
+
+model raiseHistory {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String      @unique
+  developer   String
+  role        String
+  raise       Float
+  effectiveOn DateTime
+  hiredData   hiredData[]
+}
+
+model benefits {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String      @unique
+  benefitList String[]
+  hiredData   hiredData[]
+}
+
+model vettingResults {
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String            @unique
+  skill            String?
+  vettingResult    vettingResultEnum
+  yearOfExperience Float?
+  user             user              @relation(fields: [userId], references: [userId])
+}
+
+model hiredSetting {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String      @unique
+  timeTraker      String
+  weeklySummaries String
+  hiredData       hiredData[]
+}
+
+model giveBonus {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String
+  bonusAmount Int
+  date        DateTime
+}
+
+model giveRaise {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId                String
+  raiseAmount           Int
+  effectiveOn           DateTime
+  currentRate           Int
+  afterRaiseRate        Int
+  messageRegardingRaise String
+  sentOnDate            DateTime
+}
+
+model applyAsEngineer {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  emailId     String @unique
+  phoneNo     Int    @unique
+  linkedinUrl String
+  resume      String
+}
+
+model hireTopEngineer {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String?
+  workType         workType
+  skill            String[]
+  noOfSoftEngineer String
+  firstName        String
+  lastName         String
+  companyEmail     String
+  noOfEmployee     String
+  message          String
+  findUs           String[]
+}
+
+enum workType {
+  fullTime @map("FULLTIME")
+  partTime @map("PARTTIME")
+}
+
+enum vettingResultEnum {
+  Basic        @map("Basic")
+  Intermediate @map("Intermediate")
+  Advanced     @map("Advanced")
+  Excellent    @map("Excellent")
+}
+
+model giveFeedback {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String
+  message  String
+  document String
+}
+
+model clientReview {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String @unique
+  fullName String
+  message  String
+  position String
+  profile  String
+}
+
+model availablehireDevelopers {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String
+  fullName    String
+  role        String
+  description String
+  profile     String
+  hourlyRate  Float
+}
+
+model teamDetails {
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String
+  fullName       String
+  position       String
+  profilePicture String
+  role           String
+  socialLinks    socialLink @relation(fields: [socialLinkId], references: [id])
+  socialLinkId   String     @db.ObjectId
+}
+
+enum team {
+  Founders    @map("FOUNDERS")
+  teamMembers @map("TEAMMEMBERS")
+}
+
+model community {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String
+  fullName       String
+  position       String
+  description    String
+  profilePicture String
+}
+
+model benefitQuestion {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  question       String
+  benefitsList   benefitsList @relation(fields: [benefitsListId], references: [id])
+  benefitsListId String       @db.ObjectId
+}
+
+model benefitsList {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  icon            String
+  title           String
+  description     String
+  benefitQuestion benefitQuestion[]
+}
+
+model requestedBenefits {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String
+  questionId     String
+  answer         String
+  benefitsListId String
+}
+
+model remotepoints {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String     @unique
+  points     Int
+  date       DateTime
+  pointsType pointsType
+  notes      String
+}
+
+enum pointsType {
+  credited @map("CREDITED")
+  debited  @map("DEBITED")
+}
+
+model remotePointsHistory {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String     @unique
+  points     Int
+  date       DateTime
+  pointsType pointsType
+  notes      String?
+}
+
+model requestedRedeemPoints {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @unique
+  points Int
+}
+
+model faq {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  question String
+  answer   String
+  pageName String
+}
+
+model certificate {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String @unique
+  certificate String
+  name        String
+  emailId     String @unique
+  phoneNo     Int    @unique
+  linkedinUrl String
+  resume      String
+  password    String
+}
+
+model payment {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String
+  amount      Float
+  date        DateTime
+  paymentSlip String
+}
+
+model weeklyReport {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String
+  startDate    DateTime
+  endDate      DateTime
+  workingHours Float
+  summary      String
+}
+
+model clientMonthlyReview {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String
+  month  String
+  review String
+}
+
+model successStory {
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String
+  firstName      String
+  lastName       String?
+  designation    String
+  profilePicture String
+  successStory   String
+}
+
+model trustedBy {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  logo      String
+  isVisible Boolean
+}
+
+model videos {
+  id  String @id @default(auto()) @map("_id") @db.ObjectId
+  url String
+}
+
+model eremoteLab {
+  id                 String @id @default(auto()) @map("_id") @db.ObjectId
+  userId             String @unique
+  projectType        String
+  projectBudget      String
+  projectDescription String
+  projectDocument    String
+}
